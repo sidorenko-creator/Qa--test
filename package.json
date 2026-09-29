@@ -1,0 +1,23 @@
+{
+  "name": "qa--test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "api":"npx playwright test --project=api-tests",
+    "test ui": "npx playwright test --ui"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.2"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "dotenv": "^17.4.2"
+  }
+}
