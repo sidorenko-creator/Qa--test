@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Playwright: Debug checkout test",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run test:debug -- tests/ui/checkout.spec.js"
+    }
+  ]
+}

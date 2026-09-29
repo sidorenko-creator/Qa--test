@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Playwright: Run all tests (background)",
+      "type": "shell",
+      "command": "npm run test:headless",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Playwright: Run UI tests (browser visible)",
+      "type": "shell",
+      "command": "npm run test:headed",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Playwright: Debug UI tests",
+      "type": "shell",
+      "command": "npm run test:debug",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Playwright: Run API tests",
+      "type": "shell",
+      "command": "npm run test:api",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Playwright: Open HTML report",
+      "type": "shell",
+      "command": "npm run report",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "testing.automaticallyOpenTestResults": "neverOpen",
+  "testing.followRunningTest": true,
+  "testing.showAllMessages": true,
+  "playwright.showTrace": false,
+  "playwright.reuseBrowser": false
+}

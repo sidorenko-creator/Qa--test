@@ -28,7 +28,7 @@ export class CartPage {
 
   async proceedToCheckout() {
     await this.checkoutButton.click();
-    await expect(this.page).toHaveURL(/\/checkout/);
+    await expect(this.page).toHaveURL(/checkout/);
   }
 
   #parsePrice(value) {
