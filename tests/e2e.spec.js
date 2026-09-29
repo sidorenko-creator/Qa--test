@@ -154,7 +154,7 @@ test('E2E: Успішна реєстрація, авторизація та до
   await registerPage.fillRegistationForm (newUser1);
   await loginPage.login(newUser1.email, newUser1.password);
   await catalogPage.selectProduct();
-dvvgx
+
  const bucketPage = new BucketPage(page,
      catalogPage.tabletNameValue,
      catalogPage.cofeeMachineNameValue,
