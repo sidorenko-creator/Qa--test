@@ -4,10 +4,9 @@ export class Checkoutpage {
   constructor(page) {
     this.page = page;
 
-    // Виправлено getByPlaceholder (з великої літери P)
+    
     this.cardNumberField = page.getByPlaceholder('Card Number (16 digits)');
 
-    // Залишаємо один правильний локатор для кнопки
     this.payNowBtn = page.getByRole('button', { name: 'Pay Now' });
     this.cardData = page.getByPlaceholder('MM/YY');
     this.cardCVV = page.getByPlaceholder('CVV (3 digits)')

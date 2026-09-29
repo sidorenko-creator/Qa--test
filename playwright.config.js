@@ -31,7 +31,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     headless: false,
-    baseURL: process.env.API_BASE_URL,
+
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
@@ -50,6 +50,17 @@ export default defineConfig({
     {
       name: 'api-tests',
       testMatch: '**/api.spec.js', 
+      use: {
+        baseURL: process.env.API_BASE_URL, // <-- baseURL для API
+      },
+      
+    },
+      {
+      name: 'e2e-tests',
+      testMatch: '**/e2e.spec.js', 
+      use: {
+        baseURL: process.env.UI_BASE_URL,  // <-- baseURL для UI
+      },
       
     },
     
