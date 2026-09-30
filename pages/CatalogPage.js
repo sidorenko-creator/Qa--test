@@ -1,6 +1,8 @@
 import { expect } from '@playwright/test';
 
+/** Product catalog: list of products with "add to cart" buttons. */
 export class CatalogPage {
+  /** @param {import('@playwright/test').Page} page */
   constructor(page) {
     this.page = page;
     this.coffeeMachineProduct = page.locator('#product-add-6');
@@ -12,6 +14,11 @@ export class CatalogPage {
     this.coffeeMachinePrice = page.locator('#product-price-6');
   }
 
+  /**
+   * Adds the coffee machine and the tablet to the cart, then opens the cart.
+   * @returns {Promise<{ tablet: {name: string, price: string}, coffeeMachine: {name: string, price: string} }>}
+   *          name and price of the added products (used later to verify the cart)
+   */
   async addProductsToCart() {
     await this.coffeeMachineProduct.click();
     await this.tabletProduct.click();

@@ -1,9 +1,13 @@
-
-# Playwright
+# Dependencies
 node_modules/
+
+# Playwright output
 /test-results/
 /playwright-report/
 /blob-report/
+/reports/
 /playwright/.cache/
 /playwright/.auth/
+
+# Local environment
 .env

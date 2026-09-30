@@ -1,4 +1,6 @@
+/** Registration form (reached from the login page). */
 export class RegisterPage {
+  /** @param {import('@playwright/test').Page} page */
   constructor(page) {
     this.page = page;
     this.registerLink = page.locator('#login-register-button');
@@ -14,10 +16,15 @@ export class RegisterPage {
     this.registerButton = page.locator('#register-button');
   }
 
-  async navigate() {
+  /** Opens the login page, which contains the "Register" link. */
+  async open() {
     await this.page.goto('/login');
   }
 
+  /**
+   * Opens the registration form and submits it.
+   * @param {ReturnType<import('../data/testdata.js').createUser>} user
+   */
   async register(user) {
     await this.registerLink.click();
     await this.firstName.fill(user.firstName);

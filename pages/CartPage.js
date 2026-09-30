@@ -1,6 +1,8 @@
 import { expect } from '@playwright/test';
 
+/** Shopping cart: list of added products and the total. */
 export class CartPage {
+  /** @param {import('@playwright/test').Page} page */
   constructor(page) {
     this.page = page;
     this.firstProductName = page.locator('#cart-item-name-6');
@@ -11,6 +13,7 @@ export class CartPage {
     this.checkoutButton = page.locator('#cart-checkout-button');
   }
 
+  /** Cart shows the same names and prices as the catalog did. */
   async verifyProducts(products) {
     await expect(this.firstProductName).toHaveText(products.coffeeMachine.name);
     await expect(this.secondProductName).toHaveText(products.tablet.name);
@@ -18,6 +21,7 @@ export class CartPage {
     await expect(this.secondProductPrice).toHaveText(products.tablet.price);
   }
 
+  /** Total equals the sum of both product prices. */
   async verifyTotal() {
     const firstPrice = this.#parsePrice(await this.firstProductPrice.innerText());
     const secondPrice = this.#parsePrice(await this.secondProductPrice.innerText());
