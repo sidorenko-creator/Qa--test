@@ -191,16 +191,3 @@ npm run report                  # открыть HTML-отчёт
 5. Тесту нужен пользователь без входа, то добавьте `test.use({ storageState: { cookies: [], origins: [] } })`.
 
 ---
-
-## 10. Темы курса (уроки 18–25)
-
-| # | Тема | Где |
-| --- | --- | --- |
-| 18 | `test.step` / `TestStepInfo` | все спеки (`step.attach` в checkout, API, setup) |
-| 19 | `describe`, `beforeEach/All`, `afterEach/All` | `checkout`, `registration` (beforeEach/afterEach), `posts` (beforeAll/afterAll) |
-| 20 | setup-проект и `dependencies` | проект `setup`, `tests/setup/auth.setup.js` |
-| 21 | global teardown, `storageState`, отчёты | `global-teardown.js`, `AUTH_STATE_PATH`, `reporter` |
-| 22 | тайминги и контроль выполнения | `timeout`, `expect.timeout`, `describe.configure`, timeout шага |
-| 23 | workers и retries | `workers`, `retries`, `fullyParallel`, `maxFailures` |
-| 24 | браузеры и мобильные | `chromium`, `firefox`, `webkit`, `mobile-chrome`, `mobile-safari` |
-| 25 | окружение браузера | `locale`, `timezoneId`, `geolocation`, `permissions`, `launchOptions` |
