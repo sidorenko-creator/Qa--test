@@ -1,42 +1,49 @@
 import { expect } from '@playwright/test';
+import { parsePrice } from '../utils/price.js';
 
-/** Shopping cart: list of added products and the total. */
+/** Корзина: список добавленных товаров и итоговая сумма. */
 export class CartPage {
   /** @param {import('@playwright/test').Page} page */
   constructor(page) {
     this.page = page;
-    this.firstProductName = page.locator('#cart-item-name-6');
-    this.secondProductName = page.locator('#cart-item-name-5');
-    this.firstProductPrice = page.locator('#cart-item-price-6');
-    this.secondProductPrice = page.locator('#cart-item-price-5');
     this.total = page.locator('#cart-total');
     this.checkoutButton = page.locator('#cart-checkout-button');
   }
 
-  /** Cart shows the same names and prices as the catalog did. */
+  // ── Локаторы строки корзины по ID товара ──
+  itemName = (id) => this.page.locator(`#cart-item-name-${id}`);
+  itemPrice = (id) => this.page.locator(`#cart-item-price-${id}`);
+
+  /**
+   * В корзине те же названия и цены, что были в каталоге.
+   * @param {import('../data/products.js').Product[]} products
+   */
   async verifyProducts(products) {
-    await expect(this.firstProductName).toHaveText(products.coffeeMachine.name);
-    await expect(this.secondProductName).toHaveText(products.tablet.name);
-    await expect(this.firstProductPrice).toHaveText(products.coffeeMachine.price);
-    await expect(this.secondProductPrice).toHaveText(products.tablet.price);
+    for (const product of products) {
+      await expect(this.itemName(product.id)).toHaveText(product.name);
+      await expect(this.itemPrice(product.id)).toHaveText(product.price);
+    }
   }
 
-  /** Total equals the sum of both product prices. */
-  async verifyTotal() {
-    const firstPrice = this.#parsePrice(await this.firstProductPrice.innerText());
-    const secondPrice = this.#parsePrice(await this.secondProductPrice.innerText());
-    const total = this.#parsePrice(await this.total.innerText());
+  /**
+   * «Итого» равно сумме цен товаров в корзине.
+   * toBeCloseTo вместо toBe: у дробных чисел 0.1 + 0.2 !== 0.3, точное сравнение
+   * могло бы случайно падать из-за округления.
+   * @param {import('../data/products.js').Product[]} products
+   */
+  async verifyTotal(products) {
+    let expectedTotal = 0;
+    for (const product of products) {
+      expectedTotal += parsePrice(await this.itemPrice(product.id).innerText());
+    }
 
-    expect(total).toBe(firstPrice + secondPrice);
+    const actualTotal = parsePrice(await this.total.innerText());
+    expect(actualTotal, 'Итого в корзине = сумма цен товаров').toBeCloseTo(expectedTotal, 2);
   }
 
+  /** Нажимает «Checkout» и проверяет, что открылась страница оплаты. */
   async proceedToCheckout() {
     await this.checkoutButton.click();
     await expect(this.page).toHaveURL(/checkout/);
-  }
-
-  #parsePrice(value) {
-    const normalized = value.replace(/[^0-9.,-]/g, '').replace(',', '.');
-    return Number.parseFloat(normalized);
   }
 }

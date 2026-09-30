@@ -5,7 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-  workflow_dispatch: # manual run → all browsers, including mobile emulation
+  workflow_dispatch: # ручной запуск из вкладки Actions → все браузеры и мобильная эмуляция
 
 jobs:
   test:
@@ -19,24 +19,24 @@ jobs:
           node-version: lts/*
           cache: npm
 
-      - name: Install dependencies
+      - name: Установка зависимостей
         run: npm ci
 
-      # Default run: Chromium + API  → install only Chromium (faster)
-      - name: Install Playwright browsers (Chromium)
+      # Обычный запуск (push / pull request): Chromium + API + unit → ставим только Chromium, это быстрее
+      - name: Установка браузера (Chromium)
         if: github.event_name != 'workflow_dispatch'
         run: npx playwright install --with-deps chromium
 
-      - name: Run tests (Chromium + API)
+      - name: Запуск тестов (Chromium + API + unit)
         if: github.event_name != 'workflow_dispatch'
         run: npm test
 
-      # Manual run: Chromium, Firefox, WebKit, mobile emulation + API
-      - name: Install Playwright browsers (all)
+      # Ручной запуск: все браузеры (smoke) + мобильные + API + unit
+      - name: Установка всех браузеров
         if: github.event_name == 'workflow_dispatch'
         run: npx playwright install --with-deps
 
-      - name: Run tests (all projects)
+      - name: Запуск тестов (все проекты)
         if: github.event_name == 'workflow_dispatch'
         run: npm run test:all
 

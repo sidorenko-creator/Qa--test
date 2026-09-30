@@ -1,44 +1,54 @@
 import { expect } from '@playwright/test';
 
-/** Product catalog: list of products with "add to cart" buttons. */
+/**
+ * Каталог товаров: список товаров с кнопками «добавить в корзину».
+ * Локаторы строятся по ID товара (#product-add-6 и т.д.), поэтому страница
+ * работает с любым товаром, а не только с двумя «зашитыми» в код.
+ */
 export class CatalogPage {
   /** @param {import('@playwright/test').Page} page */
   constructor(page) {
     this.page = page;
-    this.coffeeMachineProduct = page.locator('#product-add-6');
-    this.tabletProduct = page.locator('#product-add-5');
-    this.cartCount = page.locator('#cart-count');
-    this.tabletName = page.locator('#product-name-5');
-    this.coffeeMachineName = page.locator('#product-name-6');
-    this.tabletPrice = page.locator('#product-price-5');
-    this.coffeeMachinePrice = page.locator('#product-price-6');
+    this.cartCount = page.locator('#cart-count'); // бейдж с количеством товаров в корзине
   }
 
-  /**
-   * Adds the coffee machine and the tablet to the cart, then opens the cart.
-   * @returns {Promise<{ tablet: {name: string, price: string}, coffeeMachine: {name: string, price: string} }>}
-   *          name and price of the added products (used later to verify the cart)
-   */
-  async addProductsToCart() {
-    await this.coffeeMachineProduct.click();
-    await this.tabletProduct.click();
-    await expect(this.cartCount).toHaveText('2');
+  // ── Локаторы товара по ID ──
+  addButton = (id) => this.page.locator(`#product-add-${id}`);
+  productName = (id) => this.page.locator(`#product-name-${id}`);
+  productPrice = (id) => this.page.locator(`#product-price-${id}`);
 
-    const products = await this.getProductDetails();
-    await this.cartCount.click();
+  /**
+   * Добавляет товары в корзину по очереди, проверяет счётчик и открывает корзину.
+   * Предполагается, что в начале корзина пуста (у каждого теста — свежий контекст браузера).
+   * @param {number[]} ids ID товаров
+   * @returns {Promise<import('../data/products.js').Product[]>}
+   *          название и цена каждого товара — с ними потом сверяется корзина
+   */
+  async addProductsToCart(ids) {
+    for (const id of ids) {
+      await this.addButton(id).click();
+    }
+    await expect(this.cartCount).toHaveText(String(ids.length));
+
+    const products = [];
+    for (const id of ids) {
+      products.push(await this.getProduct(id));
+    }
+
+    await this.cartCount.click(); // клик по значку корзины = переход в корзину
     return products;
   }
 
-  async getProductDetails() {
+  /**
+   * Читает название и цену товара из каталога.
+   * @param {number} id
+   * @returns {Promise<import('../data/products.js').Product>}
+   */
+  async getProduct(id) {
     return {
-      tablet: {
-        name: await this.tabletName.innerText(),
-        price: await this.tabletPrice.innerText(),
-      },
-      coffeeMachine: {
-        name: await this.coffeeMachineName.innerText(),
-        price: await this.coffeeMachinePrice.innerText(),
-      },
+      id,
+      name: await this.productName(id).innerText(),
+      price: await this.productPrice(id).innerText(),
     };
   }
 }

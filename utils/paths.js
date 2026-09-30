@@ -3,11 +3,11 @@ import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-/** Folder where the authenticated session is stored (git-ignored). */
+/** Папка, где хранится сессия залогиненного пользователя (в .gitignore). */
 export const AUTH_DIR = path.join(projectRoot, 'playwright', '.auth');
 
-/** Playwright storageState: cookies + localStorage of the logged-in user. */
+/** storageState Playwright: cookies + localStorage залогиненного пользователя. */
 export const AUTH_STATE_PATH = path.join(AUTH_DIR, 'state.json');
 
-/** Extra info about the session: test user credentials and the catalog path. */
+/** Дополнительная информация о сессии: данные тестового пользователя и путь каталога. */
 export const SESSION_PATH = path.join(AUTH_DIR, 'session.json');

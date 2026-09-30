@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-/** Login form. After a successful login the catalog is shown. */
+/** Форма логина. После успешного входа открывается каталог. */
 export class LoginPage {
   /** @param {import('@playwright/test').Page} page */
   constructor(page) {
@@ -15,7 +15,7 @@ export class LoginPage {
     await this.page.goto('/login');
   }
 
-  /** Logs in through the UI and waits until the catalog is visible. */
+  /** Входит через интерфейс и ждёт, пока появится каталог. */
   async login(email, password) {
     await this.email.fill(email);
     await this.password.fill(password);
@@ -24,15 +24,15 @@ export class LoginPage {
   }
 
   /**
-   * Safety net for tests that start with a saved storageState:
-   * if the app still shows the login form (session was not restored),
-   * log in through the UI instead of failing with a confusing error.
+   * Страховка для тестов, которые стартуют с сохранённой сессией (storageState):
+   * если сайт всё равно показал форму логина (сессия не восстановилась),
+   * входим через интерфейс, а не падаем с непонятной ошибкой.
    */
   async ensureLoggedIn({ email, password }) {
     await expect(this.catalogTitle.or(this.loginButton)).toBeVisible();
 
     if (await this.loginButton.isVisible()) {
-      console.warn('[auth] storageState was not applied — logging in through the UI');
+      console.warn('[auth] storageState не сработал — входим через интерфейс');
       await this.login(email, password);
     }
   }

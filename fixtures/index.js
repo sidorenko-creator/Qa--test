@@ -9,12 +9,16 @@ import { createCardData } from '../data/testdata.js';
 import { loadSession } from '../utils/session.js';
 
 /**
- * Custom `test` with ready-to-use page objects and test data.
- * Import it instead of '@playwright/test':
+ * Свой `test` с готовыми Page Object и тестовыми данными.
+ * Вместо `new CartPage(page)` в каждом тесте просто просим `cartPage` в аргументах.
+ *
  *   import { test, expect } from '../../fixtures/index.js';
+ *   test('...', async ({ cartPage, card }) => { ... });
+ *
+ * Фикстура создаётся только если тест её запросил — лишнего не выполняется.
  */
 export const test = base.extend({
-  // ── Page objects (created per test, share the test's `page`) ──
+  // ── Page Object: создаются на каждый тест, используют его `page` ──
   registerPage: async ({ page }, use) => use(new RegisterPage(page)),
   loginPage: async ({ page }, use) => use(new LoginPage(page)),
   catalogPage: async ({ page }, use) => use(new CatalogPage(page)),
@@ -22,11 +26,11 @@ export const test = base.extend({
   checkoutPage: async ({ page }, use) => use(new CheckoutPage(page)),
   myAccountPage: async ({ page }, use) => use(new MyAccountPage(page)),
 
-  // ── Test data ──
+  // ── Тестовые данные: новая карта на каждый тест ──
   card: async ({}, use) => use(createCardData()),
 
-  // ── Saved by the "setup" project: { user, catalogPath }.
-  //    Loaded once per worker. ──
+  // ── Сессия, сохранённая проектом "setup": { user, catalogPath }.
+  //    scope: 'worker' — читается с диска один раз на воркер, а не на каждый тест. ──
   session: [async ({}, use) => use(loadSession()), { scope: 'worker' }],
 });
 

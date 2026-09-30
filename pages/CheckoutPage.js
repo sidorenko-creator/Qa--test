@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-/** Payment form shown after "Checkout" in the cart. */
+/** Форма оплаты — открывается после «Checkout» в корзине. */
 export class CheckoutPage {
   /** @param {import('@playwright/test').Page} page */
   constructor(page) {
@@ -13,7 +13,7 @@ export class CheckoutPage {
     this.myAccountButton = page.locator('[href="/account"]');
   }
 
-  /** Fills in the card data and presses "Pay Now". */
+  /** Вводит данные карты и нажимает «Pay Now». */
   async completePayment(card) {
     await this.cardNumber.fill(card.cardNumber);
     await this.cardDate.fill(card.cardDate);
@@ -23,8 +23,8 @@ export class CheckoutPage {
 
   async verifySuccessfulOrder() {
     await expect(this.page).toHaveURL(/\/checkout/);
-    // The success message check was disabled in the original test.
-    // Enable it once #checkout-success is confirmed in the app:
+    // Проверка сообщения об успехе была закомментирована в исходном тесте.
+    // Включить, когда локатор #checkout-success подтверждён на сайте:
     // await expect(this.successMessage).toBeVisible();
   }
 

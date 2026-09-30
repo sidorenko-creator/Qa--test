@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import { AUTH_DIR, SESSION_PATH } from './paths.js';
 
 /**
- * Saves the test user (created in the setup project) so that the tests
- * can reuse the credentials and the path of the catalog page.
- * @param {{ user: object, catalogPath: string }} session
+ * Сохраняет тестового пользователя (создан в проекте "setup"), чтобы тесты могли
+ * взять его логин/пароль и путь к странице каталога.
+ * @param {{ user: import('../data/testdata.js').User, catalogPath: string }} session
  */
 export function saveSession(session) {
   fs.mkdirSync(AUTH_DIR, { recursive: true });
@@ -12,14 +12,14 @@ export function saveSession(session) {
 }
 
 /**
- * @returns {{ user: object, catalogPath: string }}
+ * @returns {{ user: import('../data/testdata.js').User, catalogPath: string }}
  */
 export function loadSession() {
   if (!fs.existsSync(SESSION_PATH)) {
     throw new Error(
-      `Session file not found: ${SESSION_PATH}\n` +
-        'Run the "setup" project first (it runs automatically before UI projects, ' +
-        'unless you pass --no-deps).',
+      `Файл сессии не найден: ${SESSION_PATH}\n` +
+        'Сначала должен отработать проект "setup". Он запускается автоматически перед UI-проектами, ' +
+        'если не указан флаг --no-deps. Для повторных запусков с --no-deps поставьте KEEP_AUTH=true.',
     );
   }
   return JSON.parse(fs.readFileSync(SESSION_PATH, 'utf-8'));

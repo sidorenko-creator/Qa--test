@@ -1,4 +1,4 @@
-/** Registration form (reached from the login page). */
+/** Форма регистрации (открывается по ссылке на странице логина). */
 export class RegisterPage {
   /** @param {import('@playwright/test').Page} page */
   constructor(page) {
@@ -16,13 +16,13 @@ export class RegisterPage {
     this.registerButton = page.locator('#register-button');
   }
 
-  /** Opens the login page, which contains the "Register" link. */
+  /** Открывает страницу логина — на ней находится ссылка «Register». */
   async open() {
     await this.page.goto('/login');
   }
 
   /**
-   * Opens the registration form and submits it.
+   * Открывает форму регистрации, заполняет все поля и отправляет её.
    * @param {ReturnType<import('../data/testdata.js').createUser>} user
    */
   async register(user) {

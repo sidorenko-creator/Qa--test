@@ -1,23 +1,24 @@
 import { test, expect } from '../../fixtures/index.js';
 import { reportTestResult } from '../../utils/hooks.js';
 
-// These tests do not depend on the shop itself — they check that the browser
-// environment from playwright.config.js (locale, timezone, geolocation,
-// permissions, color scheme) is really applied.
+// Эти тесты НЕ проверяют магазин. Они проверяют, что настройки окружения браузера
+// из playwright.config.js (язык, часовой пояс, геолокация, разрешения, тема)
+// действительно применились. Это тема урока 25.
 test.describe('Browser environment', { tag: '@env' }, () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login'); // any https page of the app is enough
+    await page.goto('/login'); // подойдёт любая https-страница приложения
   });
 
   test.afterEach(reportTestResult);
 
   test('locale and timezone come from the project config', async ({ page }) => {
-    await test.step('Locale is en-US', async () => {
+    await test.step('Язык браузера — en-US', async () => {
       expect(await page.evaluate(() => navigator.language)).toBe('en-US');
     });
 
-    await test.step('Timezone is Europe/Kyiv (UTC+2 in January)', async () => {
-      // 12:00 UTC on 15 Jan → 14:00 in Kyiv, independent of the tz database name
+    await test.step('Часовой пояс — Киев (UTC+2 в январе)', async () => {
+      // 12:00 UTC 15 января → 14:00 в Киеве. Сравниваем время, а не название пояса:
+      // так результат не зависит от того, как браузер называет Europe/Kyiv или Europe/Kiev
       const kyivTime = await page.evaluate(() =>
         new Date(Date.UTC(2026, 0, 15, 12, 0)).toLocaleTimeString('en-GB', {
           hour: '2-digit',
@@ -40,12 +41,13 @@ test.describe('Browser environment', { tag: '@env' }, () => {
         ),
     );
 
+    // Координаты Киева из конфига (точность 3 знака после запятой ≈ 100 м)
     expect(position.latitude).toBeCloseTo(50.4501, 3);
     expect(position.longitude).toBeCloseTo(30.5234, 3);
   });
 
   test('geolocation permission is granted', async ({ page, browserName }) => {
-    test.skip(browserName !== 'chromium', 'Permissions API reports state differently outside Chromium');
+    test.skip(browserName !== 'chromium', 'Permissions API вне Chromium возвращает состояние иначе');
 
     const state = await page.evaluate(async () => (await navigator.permissions.query({ name: 'geolocation' })).state);
     expect(state).toBe('granted');
@@ -55,7 +57,7 @@ test.describe('Browser environment', { tag: '@env' }, () => {
     expect(await page.evaluate(() => matchMedia('(prefers-color-scheme: light)').matches)).toBe(true);
   });
 
-  // Any option from the config can be overridden for a group of tests
+  // Любую опцию из конфига можно переопределить для группы тестов через test.use
   test.describe('with overridden environment', () => {
     test.use({ colorScheme: 'dark', locale: 'uk-UA' });
 
