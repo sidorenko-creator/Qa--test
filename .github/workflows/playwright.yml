@@ -1,27 +1,90 @@
 name: Playwright Tests
+
+# ─────────────── КОГДА запускаться ───────────────
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master] # после каждого коммита в основную ветку
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master] # на каждый pull request в основную ветку
+  schedule:
+    - cron: '0 5 * * 1-5' # по будням в 05:00 UTC (ночной прогон; строку можно удалить)
+  workflow_dispatch: # кнопка «Run workflow» на вкладке Actions
+    inputs:
+      scope:
+        description: 'Что запускать'
+        type: choice
+        default: default
+        options:
+          - default # Chromium + API + unit (как при push)
+          - all-browsers # все браузеры и мобильные + API + unit
+
+# Минимальные права: токену хватает читать код
+permissions:
+  contents: read
+
+# Новый запуск в той же ветке отменяет старый, который ещё идёт (экономит время)
+concurrency:
+  group: playwright-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
+    name: Tests
+    runs-on: ubuntu-latest # чистая виртуальная машина Linux на каждый запуск
+    timeout-minutes: 30
+    env:
+      # true только при ручном запуске с выбором all-browsers
+      RUN_ALL: ${{ github.event_name == 'workflow_dispatch' && inputs.scope == 'all-browsers' }}
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      # 1. Скачать код репозитория на виртуальную машину
+      - uses: actions/checkout@v4
+
+      # 2. Поставить Node.js (с кэшем npm, чтобы установка шла быстрее)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      # 3. Поставить зависимости строго по package-lock.json
+      - name: Установка зависимостей
+        run: npm ci
+
+      # 4. Поставить браузеры и системные библиотеки для них
+      - name: Установка Chromium
+        if: env.RUN_ALL != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Установка всех браузеров
+        if: env.RUN_ALL == 'true'
+        run: npx playwright install --with-deps
+
+      # 5. Запустить тесты. CI=true выставляется автоматически → включаются
+      #    retries: 2, workers: 2, репортеры github + junit (см. playwright.config.js)
+      - name: Запуск тестов (Chromium + API + unit)
+        if: env.RUN_ALL != 'true'
+        run: npm test
+
+      - name: Запуск тестов (все проекты)
+        if: env.RUN_ALL == 'true'
+        run: npm run test:all
+
+      # 6. Сохранить HTML-отчёт (всегда, даже если тесты упали)
+      - name: Сохранение HTML-отчёта
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            reports/
+          retention-days: 30
+
+      # 7. При падении сохранить trace, скриншоты и видео (самое полезное для разбора)
+      - name: Сохранение trace, скриншотов и видео
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 14
